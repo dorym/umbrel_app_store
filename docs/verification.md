@@ -10,7 +10,7 @@ The credential-wiring assertions were observed failing before implementation, th
 
 ## Bootstrap and optional-discovery tests in the exact application image
 
-For Umbrel package **0.1.7**, `tests/bootstrap.test.cjs` and `tests/discovery.test.cjs` ran inside the unchanged audited linux/amd64 application image using its actual `better-sqlite3` dependency: **18 passed, 0 failed**. The five credential tests verify:
+For the unchanged discovery implementation originally published as package **0.1.7** (now labelled **0.1.6-umbrel.1** to expose the application version), `tests/bootstrap.test.cjs` and `tests/discovery.test.cjs` ran inside the unchanged audited linux/amd64 application image using its actual `better-sqlite3` dependency: **18 passed, 0 failed**. The five credential tests verify:
 
 - First-install seeding and password hashing, without logging the password.
 - Existing changed credentials and settings survive rerunning the bootstrap.

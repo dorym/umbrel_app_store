@@ -6,7 +6,7 @@ An independent Umbrel community app store containing **MediaDec only** (`leoparm
 
 - Requires **umbrelOS 2.0 or newer** for configurable folder access.
 - **x86_64 / linux/amd64 only.** The published image does not contain a linux/arm64 application image; ARM devices are unsupported. An attestation entry marked `unknown/unknown` is not another supported architecture. This is an intentional community-package limitation, not compliance with the official store's dual-architecture requirement.
-- Package version **0.1.7** adds optional startup discovery. The application image is unchanged: `leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe`. The digest fixes the exact image even if its tag changes; package versions can advance independently of that image.
+- Package version **0.1.6-umbrel.1** identifies **MediaDec 0.1.6 + Umbrel packaging revision 1**, including optional startup discovery. The application image is unchanged: `leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe`. Future packaging-only updates increment the `-umbrel.N` suffix; the prefix always matches the image's application version. The digest fixes the exact image even if its tag changes.
 - This package has **not been tested through Umbrel**. The isolated Docker smoke test verified seeded login, API authentication, settings, synthetic-video listing/rename/probing, password changes, and restart persistence. It does not prove Umbrel proxy/HTTPS behavior, folder-picker integration, or hardware acceleration. See [verification evidence](docs/verification.md).
 
 ## Installation and first use

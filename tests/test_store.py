@@ -27,7 +27,11 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(manifest["manifestVersion"], 2.0)
         self.assertEqual(manifest["storage"], {"dataRoot": "data"})
         self.assertEqual(manifest["name"], "MediaDec")
-        self.assertEqual(manifest["version"], "0.1.7")
+        self.assertEqual(manifest["version"], "0.1.6-umbrel.1")
+        image_tag = self.load_yaml(APP / "docker-compose.yml")["services"]["server"]["image"].split(":", 1)[1].split("@", 1)[0]
+        app_version, package_revision = manifest["version"].split("-umbrel.")
+        self.assertEqual(app_version, image_tag)
+        self.assertTrue(package_revision.isdigit() and int(package_revision) > 0)
         self.assertEqual(manifest["port"], 3009)
         for field in ("dependencies", "gallery"):
             self.assertEqual(manifest[field], [])
