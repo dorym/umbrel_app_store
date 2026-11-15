@@ -6,7 +6,7 @@ An independent Umbrel community app store containing **MediaDec only** (`leoparm
 
 - Requires **umbrelOS 2.0 or newer** for configurable folder access.
 - **x86_64 / linux/amd64 only.** The published image does not contain a linux/arm64 application image; ARM devices are unsupported. An attestation entry marked `unknown/unknown` is not another supported architecture. This is an intentional community-package limitation, not compliance with the official store's dual-architecture requirement.
-- Image: `leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe`. The digest fixes the exact image even if its tag changes. Manifest version `0.1.6` follows the public image tag, not stale source-package or build-environment version strings.
+- Package version **0.1.7** adds optional startup discovery. The application image is unchanged: `leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe`. The digest fixes the exact image even if its tag changes; package versions can advance independently of that image.
 - This package has **not been tested through Umbrel**. The isolated Docker smoke test verified seeded login, API authentication, settings, synthetic-video listing/rename/probing, password changes, and restart persistence. It does not prove Umbrel proxy/HTTPS behavior, folder-picker integration, or hardware acceleration. See [verification evidence](docs/verification.md).
 
 ## Installation and first use
@@ -17,7 +17,20 @@ An independent Umbrel community app store containing **MediaDec only** (`leoparm
 4. Start with disposable copies in a **test folder**. MediaDec can **rename, rewrite, or delete** media. Keep independent backups before granting access to an existing library.
 5. In MediaDec's **Umbrel Settings**, select the Media Library folder if you want to use existing storage. An external drive or network share must already be available through Umbrel. The selected folder appears inside MediaDec as **`/Media`** (case-sensitive); the app's `MEDIA_ROOT` matches it. Folder selection is writable by design for editing, not read-only library browsing.
 
-The default mount is an empty app-private media folder, not a host-wide or NAS mount. No hardcoded network-share path, server address, NAS password, or ARR API key is included. ARR integrations are optional and configured by the user in the app, not dependencies on other Umbrel apps.
+The default mount is an empty app-private media folder, not a host-wide or NAS mount. No private network-share path, LAN IP address, NAS password, or ARR API key is included. ARR integrations are optional and configured by the user in the app, not dependencies on other Umbrel apps.
+
+## Optional Radarr and Sonarr discovery
+
+At **each startup**, the package checks the official Umbrel names `radarr_server_1:7878` and `sonarr_server_1:8989`. If a name resolves to an IPv4 address and its TCP port responds, its internal HTTP URL is saved **only if that URL setting is empty**. The two probes run in parallel with a 1.2-second DNS/TCP deadline per service. Failed or unavailable integrations never prevent MediaDec from starting.
+
+- Radarr and Sonarr remain optional; neither is installed automatically or declared a mandatory dependency.
+- Existing non-empty URLs, API keys, passwords, media roots, and unrelated settings are preserved. A manual URL saved while discovery is running also takes precedence.
+- API keys are **not discovered or read**. Enter each key in MediaDec and click **Save settings before Test connection**: the current app's Test button uses saved settings, not unsaved form values.
+- If you install or start an integration later, restart MediaDec and reload its Settings page. This is startup discovery, not continuous monitoring.
+- To replace an incorrect saved URL through discovery, clear that URL and save, then restart MediaDec. Custom names, other machines, and IPv6-only setups still need manual URLs.
+- A responding TCP port establishes reachability, not API identity or authentication. Use Test connection with the saved API key to validate the integration.
+
+The helper performs no Docker API/container enumeration, network scan, privileged access, or inspection of other apps' files. Actual Umbrel cross-app DNS and proxy behavior still require device-level verification.
 
 ## Data and access boundaries
 
@@ -44,7 +57,7 @@ python -m unittest discover -s tests -v
 git diff --check
 ```
 
-CI runs the offline package contracts and five first-run bootstrap tests in the pinned public application image, with networking disabled inside the test container. It does not publish images or use registry credentials. The synthetic application smoke test described in `docs/verification.md` is separate. Before declaring complete Umbrel support, test a fresh install through Umbrel, both HTTP and HTTPS launch, onboarding, folder selection and update behavior. Raw Docker smoke tests are not Umbrel lifecycle verification.
+CI runs the offline package contracts, five first-run bootstrap tests, and thirteen optional-discovery tests in the pinned public application image, with networking disabled inside the test container. Discovery tests use synthetic DNS outcomes, real loopback TCP listeners and real SQLite; they cover missing/stopped integrations, deadlines, retries and preservation of settings. CI does not publish images or use registry credentials. The synthetic application smoke test described in `docs/verification.md` is separate. Before declaring complete Umbrel support, test a fresh install through Umbrel, both HTTP and HTTPS launch, onboarding, folder selection and update behavior. Raw Docker smoke tests are not Umbrel lifecycle verification.
 
 ## Support and licensing
 

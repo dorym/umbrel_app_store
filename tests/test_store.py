@@ -27,14 +27,16 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(manifest["manifestVersion"], 2.0)
         self.assertEqual(manifest["storage"], {"dataRoot": "data"})
         self.assertEqual(manifest["name"], "MediaDec")
-        self.assertEqual(manifest["version"], "0.1.6")
+        self.assertEqual(manifest["version"], "0.1.7")
         self.assertEqual(manifest["port"], 3009)
         for field in ("dependencies", "gallery"):
             self.assertEqual(manifest[field], [])
         self.assertEqual(manifest["defaultUsername"], "admin")
         self.assertTrue(manifest["deterministicPassword"])
-        for field in ("path", "defaultPassword", "releaseNotes"):
+        for field in ("path", "defaultPassword"):
             self.assertEqual(manifest[field], "")
+        self.assertIn("Radarr", manifest["releaseNotes"])
+        self.assertIn("Sonarr", manifest["releaseNotes"])
         self.assertEqual(manifest["folderAccess"], [{
             "id": "media-library", "name": "Media Library",
             "note": "Appears at /Media. MediaDec can rename, rewrite, or delete files. Use a test folder first.",
@@ -57,7 +59,7 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(server["platform"], "linux/amd64")
         self.assertEqual(server["command"], [
             "/bin/sh", "-ec",
-            "node /umbrel-bootstrap.cjs && unset UMBREL_APP_PASSWORD && exec npm start",
+            "node /umbrel-bootstrap.cjs && (node /umbrel-discovery.cjs || true) && unset UMBREL_APP_PASSWORD && exec npm start",
         ])
         self.assertTrue(server["init"])
         self.assertEqual(server["restart"], "on-failure")
@@ -66,10 +68,12 @@ class StoreTests(unittest.TestCase):
             "UMBREL_APP_PASSWORD": "${APP_PASSWORD}"})
         self.assertEqual(server["volumes"], [
             "${APP_DATA_DIR}/data/db:/db", "${APP_DATA_DIR}/data/media:/Media",
-            "${APP_DATA_DIR}/bootstrap.cjs:/umbrel-bootstrap.cjs:ro"])
-        self.assertTrue((APP / "bootstrap.cjs.template").is_file())
-        self.assertNotIn("$", (APP / "bootstrap.cjs.template").read_text(),
-                         "Umbrel envsubst must not rewrite JavaScript")
+            "${APP_DATA_DIR}/bootstrap.cjs:/umbrel-bootstrap.cjs:ro",
+            "${APP_DATA_DIR}/discovery.cjs:/umbrel-discovery.cjs:ro"])
+        for template in ("bootstrap.cjs.template", "discovery.cjs.template"):
+            self.assertTrue((APP / template).is_file())
+            self.assertNotIn("$", (APP / template).read_text(),
+                             "Umbrel envsubst must not rewrite JavaScript")
         allowed = {"image", "platform", "command", "init", "restart", "environment", "volumes", "user"}
         self.assertFalse(set(server) - allowed, "Unexpected privileges, ports, networks, or runtime settings")
         for source in ("db", "media"):
@@ -103,7 +107,7 @@ class StoreTests(unittest.TestCase):
             "uses": "actions/checkout@v4", "with": {"persist-credentials": False}})
         command = bootstrap["steps"][1]["run"]
         for required in ("docker run --rm", "--network none", IMAGE,
-                         "--entrypoint node", "--test /bootstrap.test.cjs"):
+                         "--entrypoint node", "--test /bootstrap.test.cjs /discovery.test.cjs"):
             self.assertIn(required, command)
         for forbidden in ("--privileged", "docker.sock", "secrets."):
             self.assertNotIn(forbidden, command)

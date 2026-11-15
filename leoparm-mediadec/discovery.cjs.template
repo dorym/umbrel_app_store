@@ -1,0 +1,94 @@
+// Optional Umbrel integration defaults. No API keys or Docker access are used.
+'use strict';
+const dns = require('node:dns');
+const net = require('node:net');
+const Database = require('/app/node_modules/better-sqlite3');
+
+const SERVICES = Object.freeze([
+  Object.freeze({ key: 'radarrUrl', host: 'radarr_server_1', port: 7878 }),
+  Object.freeze({ key: 'sonarrUrl', host: 'sonarr_server_1', port: 8989 }),
+]);
+function blank(value) {
+  return value === undefined || value === null ||
+    (typeof value === 'string' && value.trim() === '');
+}
+
+// An overall deadline covers DNS and TCP. A cancellable resolver avoids leaving
+// an OS DNS lookup running after an unavailable service's deadline expires.
+function probeTcp(host, port, { timeoutMs = 1200, resolverFactory } = {}) {
+  return new Promise((resolve) => {
+    let socket;
+    let resolver;
+    let finished = false;
+    const finish = (reachable) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      if (socket) socket.destroy();
+      if (resolver) {
+        try { resolver.cancel(); } catch (_) { /* Nothing left to cancel. */ }
+      }
+      resolve(reachable);
+    };
+    const timer = setTimeout(() => finish(false), timeoutMs);
+    const connect = (address) => {
+      if (finished) return;
+      try {
+        socket = net.createConnection({ host: address, port });
+        socket.once('connect', () => finish(true));
+        socket.once('error', () => finish(false));
+      } catch (_) { finish(false); }
+    };
+    try {
+      if (net.isIP(host)) {
+        connect(host);
+      } else {
+        resolver = resolverFactory ? resolverFactory() :
+          new dns.Resolver({ timeout: timeoutMs, tries: 1 });
+        resolver.resolve4(host, (error, addresses) => {
+          if (finished) return;
+          if (error || !addresses || !addresses.length) return finish(false);
+          connect(addresses[0]);
+        });
+      }
+    } catch (_) { finish(false); }
+  });
+}
+
+async function discoverOptionalArr({ databasePath = process.env.CACHE_DB_PATH,
+  probe = probeTcp } = {}) {
+  const detected = { radarrUrl: false, sonarrUrl: false };
+  let db;
+  try {
+    if (!databasePath) return detected;
+    // Credential initialization must already have created the database.
+    db = new Database(databasePath, { fileMustExist: true });
+    db.pragma('busy_timeout = 500');
+    db.exec('CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
+    const read = db.prepare('SELECT value FROM app_settings WHERE key = ?');
+    const pending = SERVICES.filter(service => blank(read.get(service.key)?.value));
+    const available = await Promise.all(pending.map(async (service) => {
+      try { return await probe(service.host, service.port) ? service : null; }
+      catch (_) { return null; }
+    }));
+    const write = db.prepare('INSERT INTO app_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
+    db.transaction(() => {
+      for (const service of available) {
+        // Recheck after the network probes so a concurrent manual save wins.
+        if (service && blank(read.get(service.key)?.value)) {
+          write.run(service.key, 'http://' + service.host + ':' + service.port);
+          detected[service.key] = true;
+        }
+      }
+    }).immediate();
+  } catch (_) {
+    // Optional discovery must not prevent startup or expose settings in logs.
+    return { radarrUrl: false, sonarrUrl: false };
+  } finally {
+    if (db) db.close();
+  }
+  return detected;
+}
+
+module.exports = { discoverOptionalArr, probeTcp };
+if (require.main === module) discoverOptionalArr().catch(() => {});

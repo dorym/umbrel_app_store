@@ -26,10 +26,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Test first-run credentials against the pinned application image
+      - name: Test credentials and discovery against the pinned application image
         run: >-
           docker run --rm --network none --entrypoint node
           --volume "$PWD/leoparm-mediadec/bootstrap.cjs.template:/bootstrap.cjs:ro"
+          --volume "$PWD/leoparm-mediadec/discovery.cjs.template:/discovery.cjs:ro"
           --volume "$PWD/tests/bootstrap.test.cjs:/bootstrap.test.cjs:ro"
+          --volume "$PWD/tests/discovery.test.cjs:/discovery.test.cjs:ro"
           leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe
-          --test /bootstrap.test.cjs
+          --test /bootstrap.test.cjs /discovery.test.cjs

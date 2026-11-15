@@ -10,7 +10,7 @@ services:
     command:
       - /bin/sh
       - -ec
-      - node /umbrel-bootstrap.cjs && unset UMBREL_APP_PASSWORD && exec npm start
+      - node /umbrel-bootstrap.cjs && (node /umbrel-discovery.cjs || true) && unset UMBREL_APP_PASSWORD && exec npm start
     init: true
     restart: on-failure
     environment:
@@ -21,3 +21,4 @@ services:
       - ${APP_DATA_DIR}/data/db:/db
       - ${APP_DATA_DIR}/data/media:/Media
       - ${APP_DATA_DIR}/bootstrap.cjs:/umbrel-bootstrap.cjs:ro
+      - ${APP_DATA_DIR}/discovery.cjs:/umbrel-discovery.cjs:ro
