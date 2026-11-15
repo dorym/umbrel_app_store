@@ -1,0 +1,39 @@
+manifestVersion: 2.0
+id: leoparm-mediadec
+storage:
+  dataRoot: data
+folderAccess:
+  - id: media-library
+    name: Media Library
+    note: Appears at /Media. MediaDec can rename, rewrite, or delete files. Use a test folder first.
+    mounts:
+      - service: server
+        targetPath: /Media
+        readOnly: false
+category: Media
+name: MediaDec
+icon: https://raw.githubusercontent.com/dorym/umbrel_app_store/main/assets/mediadec.svg
+version: "0.1.6"
+tagline: Inspect and edit video, audio, and subtitle tracks
+description: >-
+  Requires umbrelOS 2.0 or newer on x86_64 (amd64). ARM devices are not supported by this image.
+
+
+  MediaDec can rename, rewrite, or delete media files. Start with a test folder and keep independent backups before selecting an existing library in the app's Umbrel settings. Your selected folder appears at /Media inside the app.
+
+
+  Inspect media tracks, edit video, audio and subtitles, remux files, transcode media, and configure optional ARR integrations. The default media folder is private to this app; no existing library is mounted automatically.
+releaseNotes: ""
+developer: LeoParm
+website: https://github.com/dorym/umbrel_app_store
+dependencies: []
+repo: https://github.com/dorym/umbrel_app_store
+support: https://github.com/dorym/umbrel_app_store/issues
+port: 3009
+gallery: []
+path: ""
+defaultUsername: "admin"
+defaultPassword: ""
+deterministicPassword: true
+submitter: LeoParm
+submission: https://github.com/dorym/umbrel_app_store

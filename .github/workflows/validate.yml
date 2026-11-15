@@ -1,0 +1,35 @@
+name: Validate app package
+"on":
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m unittest discover -s tests -v
+      - run: git diff --check
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test first-run credentials against the pinned application image
+        run: >-
+          docker run --rm --network none --entrypoint node
+          --volume "$PWD/leoparm-mediadec/bootstrap.cjs.template:/bootstrap.cjs:ro"
+          --volume "$PWD/tests/bootstrap.test.cjs:/bootstrap.test.cjs:ro"
+          leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe
+          --test /bootstrap.test.cjs

@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  app_proxy:
+    environment:
+      APP_HOST: leoparm-mediadec_server_1
+      APP_PORT: 3000
+  server:
+    image: leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe
+    platform: linux/amd64
+    command:
+      - /bin/sh
+      - -ec
+      - node /umbrel-bootstrap.cjs && unset UMBREL_APP_PASSWORD && exec npm start
+    init: true
+    restart: on-failure
+    environment:
+      CACHE_DB_PATH: /db/cache.db
+      MEDIA_ROOT: /Media
+      UMBREL_APP_PASSWORD: ${APP_PASSWORD}
+    volumes:
+      - ${APP_DATA_DIR}/data/db:/db
+      - ${APP_DATA_DIR}/data/media:/Media
+      - ${APP_DATA_DIR}/bootstrap.cjs:/umbrel-bootstrap.cjs:ro

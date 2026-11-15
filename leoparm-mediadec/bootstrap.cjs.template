@@ -1,0 +1,35 @@
+// Umbrel renders this unchanged as bootstrap.cjs before starting the app.
+// Seed only an empty credentials table; never reset an existing user's password.
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const Database = require('/app/node_modules/better-sqlite3');
+
+let db;
+try {
+  const databasePath = process.env.CACHE_DB_PATH;
+  if (!databasePath) throw new Error('Database path is required');
+  fs.mkdirSync(path.dirname(databasePath), { recursive: true });
+  db = new Database(databasePath);
+  db.pragma('busy_timeout = 5000');
+  db.exec('CREATE TABLE IF NOT EXISTS auth_credentials (username TEXT NOT NULL, password_hash TEXT NOT NULL, salt TEXT NOT NULL)');
+  db.transaction(function seedCredentials() {
+    if (db.prepare('SELECT 1 FROM auth_credentials LIMIT 1').get()) return;
+    const password = process.env.UMBREL_APP_PASSWORD;
+    if (typeof password !== 'string' || password.length < 12) {
+      throw new Error('Umbrel per-install password is required');
+    }
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+    db.prepare('INSERT INTO auth_credentials (username, password_hash, salt) VALUES (?, ?, ?)')
+      .run('admin', hash, salt);
+  }).immediate();
+} catch (_) {
+  // Do not expose passwords, database contents, or exception payloads in logs.
+  console.error('MediaDec first-run credential initialization failed. Check app storage and Umbrel password configuration.');
+  process.exitCode = 1;
+} finally {
+  if (db) db.close();
+}
