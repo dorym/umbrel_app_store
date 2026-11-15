@@ -33,5 +33,5 @@ jobs:
           --volume "$PWD/leoparm-mediadec/discovery.cjs.template:/discovery.cjs:ro"
           --volume "$PWD/tests/bootstrap.test.cjs:/bootstrap.test.cjs:ro"
           --volume "$PWD/tests/discovery.test.cjs:/discovery.test.cjs:ro"
-          leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe
+          leoparm/mediadec:0.1.7@sha256:88ded0e831757883fdfa1a98fe39ec4914087ad94fb83a0079bc9dfae5851833
           --test /bootstrap.test.cjs /discovery.test.cjs

@@ -6,8 +6,8 @@ An independent Umbrel community app store containing **MediaDec only** (`leoparm
 
 - Requires **umbrelOS 2.0 or newer** for configurable folder access.
 - **x86_64 / linux/amd64 only.** The published image does not contain a linux/arm64 application image; ARM devices are unsupported. An attestation entry marked `unknown/unknown` is not another supported architecture. This is an intentional community-package limitation, not compliance with the official store's dual-architecture requirement.
-- Package version **0.1.6-umbrel.1** identifies **MediaDec 0.1.6 + Umbrel packaging revision 1**, including optional startup discovery. The application image is unchanged: `leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe`. Future packaging-only updates increment the `-umbrel.N` suffix; the prefix always matches the image's application version. The digest fixes the exact image even if its tag changes.
-- This package has **not been tested through Umbrel**. The isolated Docker smoke test verified seeded login, API authentication, settings, synthetic-video listing/rename/probing, password changes, and restart persistence. It does not prove Umbrel proxy/HTTPS behavior, folder-picker integration, or hardware acceleration. See [verification evidence](docs/verification.md).
+- Package version **0.1.7-umbrel.1** identifies **MediaDec 0.1.7 + Umbrel packaging revision 1**, including the fix for testing unsaved Radarr/Sonarr connection fields and optional startup discovery. The application image is: `leoparm/mediadec:0.1.7@sha256:88ded0e831757883fdfa1a98fe39ec4914087ad94fb83a0079bc9dfae5851833`. Future packaging-only updates increment the `-umbrel.N` suffix; the prefix always matches the image's application version. The digest fixes the exact image even if its tag changes.
+- This package has **not been tested through Umbrel**. The isolated Docker smoke test of the earlier 0.1.6 image verified seeded login, API authentication, settings, synthetic-video listing/rename/probing, password changes, and restart persistence. It does not prove Umbrel proxy/HTTPS behavior, folder-picker integration, or hardware acceleration. See [verification evidence](docs/verification.md).
 
 ## Installation and first use
 
@@ -25,10 +25,10 @@ At **each startup**, the package checks the official Umbrel names `radarr_server
 
 - Radarr and Sonarr remain optional; neither is installed automatically or declared a mandatory dependency.
 - Existing non-empty URLs, API keys, passwords, media roots, and unrelated settings are preserved. A manual URL saved while discovery is running also takes precedence.
-- API keys are **not discovered or read**. Enter each key in MediaDec and click **Save settings before Test connection**: the current app's Test button uses saved settings, not unsaved form values.
+- API keys are **not discovered or read**. Enter the URL and key in MediaDec and click **Test connection**: MediaDec 0.1.7 tests the current fields, including unsaved changes. Testing does not save settings; click **Save** to persist them for sync.
 - If you install or start an integration later, restart MediaDec and reload its Settings page. This is startup discovery, not continuous monitoring.
 - To replace an incorrect saved URL through discovery, clear that URL and save, then restart MediaDec. Custom names, other machines, and IPv6-only setups still need manual URLs.
-- A responding TCP port establishes reachability, not API identity or authentication. Use Test connection with the saved API key to validate the integration.
+- A responding TCP port establishes reachability, not API identity or authentication. Use Test connection with the current URL and API key to validate the integration.
 
 The helper performs no Docker API/container enumeration, network scan, privileged access, or inspection of other apps' files. Actual Umbrel cross-app DNS and proxy behavior still require device-level verification.
 
@@ -43,7 +43,7 @@ This is a **fresh app-data** installation, **not a migration** of any existing D
 
 The compose package uses Umbrel's proxy and network injection. It requests no raw host ports, host network, Docker socket, devices, elevated capabilities, or privileged mode. It retains the image's bundled runtime user and entrypoint; arbitrary-UID compatibility has not been established here. Treat mounted data and the shared container network as security boundaries requiring separate runtime review.
 
-A public container image exposes compiled application code and bundled image/dependency files. Publishing an image does **not** publish external data mounts by default; any data copied into an image during its build is a separate concern. The bounded [image audit](docs/mediadec-image-audit.md) inspected every layer of the pinned image and found no user-data or service-credential leak; it documents the framework build artifacts and public self-test fixtures that triggered scanners. This is not a vulnerability or application-security certification.
+A public container image exposes compiled application code and bundled image/dependency files. Publishing an image does **not** publish external data mounts by default; any data copied into an image during its build is a separate concern. The bounded [image audit](docs/mediadec-image-audit.md) inspected every layer of the earlier 0.1.6 image (not the new 0.1.7 image) and found no user-data or service-credential leak; it documents the framework build artifacts and public self-test fixtures that triggered scanners. This is not a vulnerability or application-security certification.
 
 ## Development checks
 

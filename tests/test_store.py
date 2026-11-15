@@ -7,7 +7,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 APP_ID = "leoparm-mediadec"
 APP = ROOT / APP_ID
-IMAGE = "leoparm/mediadec:0.1.6@sha256:bc18bb01dcf90925261c5ac8bd4ba8fffb95a80fbb0819a13417c8a9b9beb4fe"
+IMAGE = "leoparm/mediadec:0.1.7@sha256:88ded0e831757883fdfa1a98fe39ec4914087ad94fb83a0079bc9dfae5851833"
 
 
 class StoreTests(unittest.TestCase):
@@ -27,7 +27,7 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(manifest["manifestVersion"], 2.0)
         self.assertEqual(manifest["storage"], {"dataRoot": "data"})
         self.assertEqual(manifest["name"], "MediaDec")
-        self.assertEqual(manifest["version"], "0.1.6-umbrel.1")
+        self.assertEqual(manifest["version"], "0.1.7-umbrel.1")
         image_tag = self.load_yaml(APP / "docker-compose.yml")["services"]["server"]["image"].split(":", 1)[1].split("@", 1)[0]
         app_version, package_revision = manifest["version"].split("-umbrel.")
         self.assertEqual(app_version, image_tag)
@@ -91,7 +91,7 @@ class StoreTests(unittest.TestCase):
         for phrase in ("https://github.com/dorym/umbrel_app_store", "umbrelOS 2.0", "x86_64", "amd64",
                        "arm64", "test folder", "rename", "rewrite", "delete", "/Media", "/db/cache.db",
                        "fresh app-data", "not a migration", "Require Umbrel login", "compiled application code",
-                       "external data mounts", "packaging support", "upstream license", "0.1.6",
+                       "external data mounts", "packaging support", "upstream license", "0.1.7",
                        "not been tested through Umbrel", "python -m unittest discover -s tests -v"):
             self.assertIn(phrase, text)
         self.assertNotIn("latest@", text)

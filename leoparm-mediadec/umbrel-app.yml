@@ -13,7 +13,7 @@ folderAccess:
 category: Media
 name: MediaDec
 icon: https://raw.githubusercontent.com/dorym/umbrel_app_store/main/assets/mediadec.svg
-version: "0.1.6-umbrel.1"
+version: "0.1.7-umbrel.1"
 tagline: Inspect and edit video, audio, and subtitle tracks
 description: >-
   Requires umbrelOS 2.0 or newer on x86_64 (amd64). ARM devices are not supported by this image.
@@ -24,7 +24,7 @@ description: >-
 
   Inspect media tracks, edit video, audio and subtitles, remux files, transcode media, and configure optional ARR integrations. The default media folder is private to this app; no existing library is mounted automatically.
 releaseNotes: >-
-  Umbrel package update: discover reachable official Radarr and Sonarr addresses at startup and fill only empty URL settings. Existing URLs, API keys and passwords are preserved. Both integrations remain optional. The MediaDec 0.1.6 application image is unchanged.
+  MediaDec 0.1.7 fixes Radarr and Sonarr connection tests to use the current URL and API key fields, including unsaved edits, without saving configuration. Optional startup discovery and existing settings, API keys and passwords are preserved.
 developer: LeoParm
 website: https://github.com/dorym/umbrel_app_store
 dependencies: []
