@@ -35,3 +35,16 @@ jobs:
           --volume "$PWD/tests/discovery.test.cjs:/discovery.test.cjs:ro"
           leoparm/mediadec:0.1.7@sha256:88ded0e831757883fdfa1a98fe39ec4914087ad94fb83a0079bc9dfae5851833
           --test /bootstrap.test.cjs /discovery.test.cjs
+  tradeshow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Test Tradeshow setup, authentication and persistence in its pinned image
+        run: >-
+          docker run --rm --network none --entrypoint node
+          --volume "$PWD/tests/tradeshow-image.test.cjs:/tradeshow-image.test.cjs:ro"
+          leoparm/tradeshow:0.1.1@sha256:804ce66897bf26772fda742e31eed8c8c35661a4f6a803773b009abcb21848fe
+          --test /tradeshow-image.test.cjs

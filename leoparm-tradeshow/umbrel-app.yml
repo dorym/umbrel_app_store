@@ -1,0 +1,31 @@
+manifestVersion: 2.0
+id: leoparm-tradeshow
+storage:
+  dataRoot: data
+category: finance
+name: Tradeshow
+icon: https://raw.githubusercontent.com/dorym/umbrel_app_store/main/assets/tradeshow.svg
+version: "0.1.1-umbrel.1"
+tagline: Track portfolios, accounts, transactions, and market data
+description: >-
+  Launch through Umbrel over HTTPS using the device hostname. On first launch, use Create admin account to choose your own email and a password of at least 12 characters. There is no shared or pre-seeded login. Keep Require Umbrel login enabled.
+
+
+  Requires umbrelOS 2.0 or newer on x86_64 (amd64); the published image does not support ARM. Known upstream framework security issue SEC-01 remains open. Do not expose this release directly to untrusted traffic; this package does not patch the application.
+
+
+  Tradeshow is a self-hosted investment portfolio tracker with accounts, transactions, CSV/JSON and supported brokerage imports, holdings, and market/foreign-exchange data. Financial records stay in app-private SQLite storage. Market data and calculations are not financial advice or trading-grade guarantees. This is a fresh installation, not a migration of another deployment.
+releaseNotes: ""
+developer: LeoParm
+website: https://github.com/dorym/umbrel_app_store
+dependencies: []
+repo: https://github.com/dorym/umbrel_app_store
+support: https://github.com/dorym/umbrel_app_store/issues
+port: 3057
+requiresHttps: true
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+submitter: LeoParm
+submission: https://github.com/dorym/umbrel_app_store

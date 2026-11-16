@@ -1,6 +1,6 @@
 # LeoParm's Apps
 
-An independent Umbrel community app store containing **MediaDec only** (`leoparm-mediadec`). This is not an official Umbrel app-store submission.
+An independent Umbrel community app store containing **MediaDec** (`leoparm-mediadec`) and **Tradeshow** (`leoparm-tradeshow`). This is not an official Umbrel app-store submission.
 
 ## Compatibility and status
 
@@ -9,7 +9,15 @@ An independent Umbrel community app store containing **MediaDec only** (`leoparm
 - Package version **0.1.7-umbrel.1** identifies **MediaDec 0.1.7 + Umbrel packaging revision 1**, including the fix for testing unsaved Radarr/Sonarr connection fields and optional startup discovery. The application image is: `leoparm/mediadec:0.1.7@sha256:88ded0e831757883fdfa1a98fe39ec4914087ad94fb83a0079bc9dfae5851833`. Future packaging-only updates increment the `-umbrel.N` suffix; the prefix always matches the image's application version. The digest fixes the exact image even if its tag changes.
 - This package has **not been tested through Umbrel**. The isolated Docker smoke test of the earlier 0.1.6 image verified seeded login, API authentication, settings, synthetic-video listing/rename/probing, password changes, and restart persistence. It does not prove Umbrel proxy/HTTPS behavior, folder-picker integration, or hardware acceleration. See [verification evidence](docs/verification.md).
 
-## Installation and first use
+## Tradeshow 0.1.1
+
+Tradeshow is now available as **0.1.1-umbrel.1** on x86_64 (amd64), using the digest-pinned public `leoparm/tradeshow:0.1.1` image. HTTPS browser port: **3057**. Use the canonical Umbrel device hostname; direct IP, plain-HTTP login and alternate domains are not supported by this package. On an empty installation, choose your own email/password in **Create admin account**; no default app credentials are advertised. Its SQLite data persists under the app-private `data/` directory, and Umbrel supplies a stable per-install session secret through `APP_SEED`. No existing financial database is migrated or mounted.
+
+**Security limitation:** upstream Next.js 15.3.1 remains affected by the open **SEC-01** framework issue. Keep **Require Umbrel login** enabled and do not expose this release directly to untrusted traffic. Packaging does not patch the application. See [Tradeshow setup, persistence and verification limits](docs/tradeshow.md). Actual installation and proxy behavior have not been tested through Umbrel.
+
+The MediaDec package and its port/data/bootstrap settings are unchanged.
+
+## MediaDec installation and first use
 
 1. In Umbrel's App Store, open the community app-store settings and add `https://github.com/dorym/umbrel_app_store`.
 2. Install **MediaDec**, then open it from Umbrel. Its browser launch port is `3009`; the internal application listens on `3000`.
@@ -57,7 +65,7 @@ python -m unittest discover -s tests -v
 git diff --check
 ```
 
-CI runs the offline package contracts, five first-run bootstrap tests, and thirteen optional-discovery tests in the pinned public application image, with networking disabled inside the test container. Discovery tests use synthetic DNS outcomes, real loopback TCP listeners and real SQLite; they cover missing/stopped integrations, deadlines, retries and preservation of settings. CI does not publish images or use registry credentials. The synthetic application smoke test described in `docs/verification.md` is separate. Before declaring complete Umbrel support, test a fresh install through Umbrel, both HTTP and HTTPS launch, onboarding, folder selection and update behavior. Raw Docker smoke tests are not Umbrel lifecycle verification.
+CI runs the offline package contracts, Tradeshow native-image setup/authentication/persistence checks, five MediaDec first-run bootstrap tests, and thirteen MediaDec optional-discovery tests in the pinned public application images, with networking disabled inside the test container. Discovery tests use synthetic DNS outcomes, real loopback TCP listeners and real SQLite; they cover missing/stopped integrations, deadlines, retries and preservation of settings. CI does not publish images or use registry credentials. The synthetic application smoke test described in `docs/verification.md` is separate. Before declaring complete Umbrel support, test a fresh install through Umbrel, both HTTP and HTTPS launch, onboarding, folder selection and update behavior. Raw Docker smoke tests are not Umbrel lifecycle verification.
 
 ## Support and licensing
 

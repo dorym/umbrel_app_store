@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Tradeshow</title>
+  <rect width="256" height="256" rx="52" fill="#101c24"/>
+  <path d="M47 58V202H210" fill="none" stroke="#496473" stroke-width="10" stroke-linecap="round"/>
+  <rect x="70" y="137" width="28" height="43" rx="6" fill="#43b68b"/>
+  <rect x="119" y="106" width="28" height="74" rx="6" fill="#65d4a7"/>
+  <rect x="168" y="65" width="28" height="115" rx="6" fill="#91edc8"/>
+  <path d="M75 111L124 79L174 42" fill="none" stroke="#dcfff0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -19,9 +19,9 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(self.load_yaml(ROOT / "umbrel-app-store.yml"),
                          {"id": "leoparm", "name": "LeoParm's Apps"})
 
-    def test_single_app_manifest(self):
+    def test_mediadec_manifest_with_expanded_inventory(self):
         manifest = self.load_yaml(APP / "umbrel-app.yml")
-        self.assertEqual(sorted(p.parent.name for p in ROOT.glob("*/umbrel-app.yml")), [APP_ID])
+        self.assertEqual(sorted(p.parent.name for p in ROOT.glob("*/umbrel-app.yml")), [APP_ID, "leoparm-tradeshow"])
         self.assertEqual(manifest["id"], APP_ID)
         self.assertTrue(manifest["id"].startswith(self.load_yaml(ROOT / "umbrel-app-store.yml")["id"] + "-"))
         self.assertEqual(manifest["manifestVersion"], 2.0)
@@ -103,7 +103,7 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(workflow["permissions"], {"contents": "read"})
         # PyYAML's YAML 1.1 treats an unquoted 'on' as a boolean; keep it quoted.
         self.assertEqual(workflow["on"], {"push": None, "pull_request": None, "workflow_dispatch": None})
-        self.assertEqual(set(workflow["jobs"]), {"validate", "bootstrap"})
+        self.assertEqual(set(workflow["jobs"]), {"validate", "bootstrap", "tradeshow"})
         bootstrap = workflow["jobs"]["bootstrap"]
         self.assertEqual(bootstrap["runs-on"], "ubuntu-latest")
         self.assertEqual(bootstrap["timeout-minutes"], 10)
